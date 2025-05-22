@@ -1,0 +1,142 @@
+{% extends 'layout.html' %}
+
+{% block title %}Nuevo Pedido - Sistema de Gestión de Restaurante{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <h4 class="mb-0">Nuevo Pedido</h4>
+    </div>
+    <div class="card-body">
+        <form method="POST" id="pedidoForm">
+            <div class="row mb-3">
+        <form action="#" method="post">
+            <div class="mb-3">
+                <label for="cliente" class="form-label">Nombre del Cliente *</label>
+                <input type="text" class="form-control" id="cliente" name="cliente" required>
+            </div>
+                <div class="col-md-6">
+                    <label for="mesa" class="form-label">Número de Mesa</label>
+                    <input type="number" class="form-control" id="mesa" name="mesa" min="1">
+                </div>
+            </div>
+            
+            <h5 class="mb-3">Detalles del Pedido</h5>
+            
+            <div id="detalles-container">
+                <div class="detalle-item card mb-3">
+                    <div class="card-body">
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Plato *</label>
+                                <select class="form-select plato-select" name="plato_id[]" required>
+                                    <option value="">Seleccionar plato</option>
+                                    {% for plato in platos %}
+                                    <option value="{{ plato.id }}" data-precio="{{ plato.precio }}">
+                                        {{ plato.nombre }} - ${{ "%.2f"|format(plato.precio) }}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Cantidad *</label>
+                                <input type="number" class="form-control cantidad-input" name="cantidad[]" min="1" value="1" required>
+                            </div>
+                            <div class="col-md-2 d-flex align-items-end">
+                                <button type="button" class="btn btn-danger btn-sm remove-item w-100">
+                                    <i class="fas fa-trash"></i> Eliminar
+                                </button>
+                            </div>
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label">Notas o especificaciones</label>
+                            <textarea class="form-control" name="notas[]" rows="2"></textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mb-3">
+                <button type="button" id="add-item" class="btn btn-success">
+                    <i class="fas fa-plus"></i> Agregar Plato
+                </button>
+            </div>
+            
+            <div class="d-flex justify-content-between">
+                <a href="{{ url_for('order.pedidos_list') }}" class="btn btn-secondary">Cancelar</a>
+                <button type="submit" class="btn btn-primary">Crear Pedido</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Agregar nuevo item al pedido
+        document.getElementById('add-item').addEventListener('click', function() {
+            const container = document.getElementById('detalles-container');
+            const template = document.querySelector('.detalle-item').cloneNode(true);
+            
+            // Limpiar valores
+            template.querySelector('.plato-select').value = '';
+            template.querySelector('.cantidad-input').value = '1';
+            template.querySelector('textarea').value = '';
+            
+            // Agregar evento para eliminar
+            template.querySelector('.remove-item').addEventListener('click', function() {
+                if (document.querySelectorAll('.detalle-item').length > 1) {
+                    this.closest('.detalle-item').remove();
+                } else {
+                    alert('El pedido debe tener al menos un plato.');
+                }
+            });
+            
+            container.appendChild(template);
+        });
+        
+        // Configurar el primer botón de eliminar
+        document.querySelector('.remove-item').addEventListener('click', function() {
+            if (document.querySelectorAll('.detalle-item').length > 1) {
+                this.closest('.detalle-item').remove();
+            } else {
+                alert('El pedido debe tener al menos un plato.');
+            }
+        });
+        
+        // Validar formulario antes de enviar
+        document.getElementById('pedidoForm').addEventListener('submit', function(e) {
+            const platos = document.querySelectorAll('.plato-select');
+            const cantidades = document.querySelectorAll('.cantidad-input');
+            let isValid = true;
+            
+            // Verificar que no haya platos duplicados
+            const platosSeleccionados = [];
+            platos.forEach(function(plato) {
+                if (plato.value && platosSeleccionados.includes(plato.value)) {
+                    alert('No puedes agregar el mismo plato más de una vez. Ajusta la cantidad en su lugar.');
+                    isValid = false;
+                    e.preventDefault();
+                    return;
+                }
+                if (plato.value) {
+                    platosSeleccionados.push(plato.value);
+                }
+            });
+            
+            // Verificar que todos los platos tengan cantidad
+            cantidades.forEach(function(cantidad, index) {
+                if (platos[index].value && (!cantidad.value || parseInt(cantidad.value) < 1)) {
+                    alert('Todos los platos deben tener una cantidad válida.');
+                    isValid = false;
+                    e.preventDefault();
+                    return;
+                }
+            });
+            
+            return isValid;
+        });
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,54 @@
+{% extends 'layout.html' %}
+
+{% block title %}Dashboard - Sistema de Gestión de Restaurante{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="mb-0">Dashboard</h4>
+            </div>
+            <div class="card-body">
+                <h5>Bienvenido, {{ session.usuario_nombre }}</h5>
+                <p>Este es el panel de control del Sistema de Gestión de Restaurante.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-4">
+        <div class="card text-center">
+            <div class="card-body">
+                <i class="fas fa-utensils fa-3x mb-3" style="color: var(--primary);"></i>
+                <h5 class="card-title">Gestión de Menú</h5>
+                <p class="card-text">Administra los platos disponibles en tu restaurante.</p>
+                <a href="{{ url_for('menu.menu_list') }}" class="btn btn-primary">Ir al Menú</a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card text-center">
+            <div class="card-body">
+                <i class="fas fa-clipboard-list fa-3x mb-3" style="color: var(--primary);"></i>
+                <h5 class="card-title">Gestión de Pedidos</h5>
+                <p class="card-text">Registra y administra los pedidos de los clientes.</p>
+                <a href="{{ url_for('order.pedidos_list') }}" class="btn btn-primary">Ver Pedidos</a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card text-center">
+            <div class="card-body">
+                <i class="fas fa-plus-circle fa-3x mb-3" style="color: var(--primary);"></i>
+                <h5 class="card-title">Nuevo Pedido</h5>
+                <p class="card-text">Registra un nuevo pedido rápidamente.</p>
+                <a href="{{ url_for('order.nuevo_pedido') }}" class="btn btn-primary">Crear Pedido</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
